@@ -20,10 +20,19 @@ public class GameManager : MonoBehaviour
     public static Player player;
 
     public static WaveManager waveManager;
+    public static UIManager uiManager;
+    public static GridManager gridManager;
+    public static PoolManager poolManager;
+    
+    public int maxMonster;
+    public int monsterKillCount = 0;
+    public int flowerCount = 0;
+
+    bool gameOver = false;
 
     float waterFullTime = 1.8f;
 
-    int maxHeart = 6;
+    int maxHeart = 7;
 
     int swordType = 1;
     float swordCool = 1f;
@@ -51,7 +60,13 @@ public class GameManager : MonoBehaviour
         set { maxHeart = value; }
     }
 
-    
+    public bool GameOver
+    {
+        get { return gameOver; }
+        set { gameOver = value; }
+    }
+
+
     #endregion
 
     private void Awake()
@@ -62,6 +77,11 @@ public class GameManager : MonoBehaviour
         }
         player = FindObjectOfType<Player>();
         waveManager = FindObjectOfType<WaveManager>();
+        uiManager = FindObjectOfType<UIManager>();
+        gridManager = FindObjectOfType<GridManager>();
+        poolManager = FindObjectOfType<PoolManager>();
+
+        
     }
 
     void Start()
@@ -70,8 +90,5 @@ public class GameManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
-    }
+   
 }

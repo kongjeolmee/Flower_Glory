@@ -17,6 +17,6 @@ public class MonsterData : ScriptableObject
     public float knockbackRange;
     public Monster.TargetType targetType;
     public Monster.MoveType moveType;
-
+    public AnimatorOverrideController overrideController;
 
 }

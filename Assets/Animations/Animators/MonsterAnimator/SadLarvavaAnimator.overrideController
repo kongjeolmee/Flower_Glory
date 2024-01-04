@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SadLarvavaAnimator
+  m_Controller: {fileID: 9100000, guid: 9c6d907e735f8b54296d96b2e7475925, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: a0967e62e3189444296cda9aaf22b24d, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f490149ca56d0d3469518b147016106b, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 592d216525eadda438aa47524953637a, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f490149ca56d0d3469518b147016106b, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 82d6a6016824b71409f08c11fb08c6e8, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f490149ca56d0d3469518b147016106b, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 467175b92fca33f48ab0fd3a02b34f2d, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: f490149ca56d0d3469518b147016106b, type: 2}

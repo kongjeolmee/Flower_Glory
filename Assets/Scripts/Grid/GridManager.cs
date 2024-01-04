@@ -10,7 +10,8 @@ public class GridManager : MonoBehaviour
 
 
     [SerializeField] private List<string> waterWells = new List<string>();
-    private Dictionary<Vector2, Tile> _tiles;
+    public List<Transform> _tiles = new List<Transform>();
+
 
     void Start()
     {
@@ -19,7 +20,6 @@ public class GridManager : MonoBehaviour
 
     void GenerateGrid()
     {
-        _tiles = new Dictionary<Vector2, Tile>();
         for (int x = 0; x < _width * 3; x += 3)
         {
             for (int y = 0; y < _height * 3; y += 3)
@@ -38,8 +38,8 @@ public class GridManager : MonoBehaviour
                 }
                 if(spawnedTile.gameObject.layer != 10)
                 {
-                    
-                     _tiles[new Vector2(x, y)] = spawnedTile;
+
+                    _tiles.Add(spawnedTile.GetComponent<Transform>());
                 }
                 spawnedTile.Init();
             }
@@ -47,9 +47,4 @@ public class GridManager : MonoBehaviour
 
     }
 
-    public Tile GetTileAtPosition(Vector2 pos)
-    {
-        if (_tiles.TryGetValue(pos, out var tile)) return tile;
-        return null;
-    }
 }

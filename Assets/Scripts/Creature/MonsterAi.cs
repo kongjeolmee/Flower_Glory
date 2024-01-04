@@ -12,6 +12,7 @@ public class Monster
         all = 0,
         tileOnly,
         playerOnly,
+        prowl,
         none
     }
     public enum MoveType
@@ -32,6 +33,7 @@ public class Monster
     public MoveType moveType;
 }
 
+
 public class MonsterAi : MonoBehaviour
 {
     public MonsterData monsterOriginData;
@@ -39,6 +41,7 @@ public class MonsterAi : MonoBehaviour
 
     Coroutine atkCoroutine;
     Coroutine hitCoroutine;
+    Coroutine targetCoroutine;
 
     public Transform _target;
     int flowerBeforCount = 0;
@@ -47,14 +50,20 @@ public class MonsterAi : MonoBehaviour
     Collider2D coll;
     SpriteRenderer spriteRenderer;
     Animator anim;
+
     void Awake()
     {
-        MonsterSetting();
         rigid = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
     }
+
+    private void OnEnable()
+    {
+        MonsterSetting();
+    }
+
 
     void MonsterSetting()
     {
@@ -64,16 +73,19 @@ public class MonsterAi : MonoBehaviour
         monster.atkDelAfter = monsterOriginData.atkDelAfter;
         monster.atkDelBefore = monsterOriginData.atkDelBefore;
         monster.speed = monsterOriginData.speed;
-        monster.speed += UnityEngine.Random.Range(-0.3f,0.3f);
+        monster.speed += UnityEngine.Random.Range(-0.3f, 0.3f);
         monster.attackRange = monsterOriginData.attackRange;
         monster.knockbackRange = monsterOriginData.knockbackRange;
         monster.targetType = monsterOriginData.targetType;
         monster.moveType = monsterOriginData.moveType;
+        anim.runtimeAnimatorController = (RuntimeAnimatorController)monsterOriginData.overrideController;
+        anim.Rebind();
+
 
     }
     private void Start()
     {
-        StartCoroutine("TargetSearch");
+        StartTargetSearch();
     }
 
 
@@ -89,8 +101,16 @@ public class MonsterAi : MonoBehaviour
                 {
                     if (atkCoroutine == null)
                     {
+                        if (monster.targetType == Monster.TargetType.prowl)
+                        {
+                            _target = null;
+                            GetTarget();
+                        }
+                        else
+                        {
+                            StartAttack();
+                        }
 
-                        StartAttack();
                     }
                 }
                 else
@@ -108,47 +128,75 @@ public class MonsterAi : MonoBehaviour
                     anim.SetBool("move", true);
                 }
             }
-            else
-            {
-            }
             
+        }
+    }
+    void StartTargetSearch()
+    {
+        targetCoroutine = StartCoroutine(TargetSearch());
+    }
+
+    void StopTargetSearch()
+    {
+        if (targetCoroutine != null)
+        {
+            StopCoroutine(targetCoroutine);
+            targetCoroutine = null;
         }
     }
 
     IEnumerator TargetSearch()
     {
-        while(true)
+        if (monster.targetType == Monster.TargetType.prowl)
         {
-            if(atkCoroutine == null)
+            while (targetCoroutine != null)
             {
-                if (_target == null)
-                {
-                    GetTarget();
-                }
-                else if (!GameManager.waveManager.flowerTileList.Contains(_target))
-                {
+                    if (_target == null)
+                    {
+                        GetTarget();
+                    }
 
-                    if (monster.targetType == Monster.TargetType.all && _target == GameManager.player)
+                yield return null;
+            }
+
+        }
+        else
+        {
+            while (true)
+            {
+                if (atkCoroutine == null)
+                {
+                    if (_target == null)
+                    {
+                        GetTarget();
+                    }
+                    else if (!GameManager.waveManager.flowerTileList.Contains(_target))
+                    {
+
+                        if (monster.targetType == Monster.TargetType.all && _target == GameManager.player)
+                        {
+                            GetTarget();
+                            yield return new WaitForSeconds(0.1f);
+                        }
+                        else
+                        {
+                            _target = null;
+                            GetTarget();
+
+                        }
+                    }
+                    else if (GameManager.waveManager.flowerTileList.Count != flowerBeforCount)
                     {
                         GetTarget();
                         yield return new WaitForSeconds(0.1f);
                     }
-                    else
-                    {
-                        _target = null;
-                        GetTarget();
 
-                    }
-                }else if(GameManager.waveManager.flowerTileList.Count != flowerBeforCount)
-                {
-                    GetTarget();
-                    yield return new WaitForSeconds(0.1f);
                 }
 
+                yield return null;
             }
-
-            yield return null;
         }
+        
     }
 
     void GetTarget()
@@ -266,7 +314,7 @@ public class MonsterAi : MonoBehaviour
         }
         else
         {
-
+            GameManager.Instance.monsterKillCount++;
             spriteRenderer.color = Color.red;
             yield return new WaitForSeconds(0.1f);
             rigid.velocity = Vector3.zero;

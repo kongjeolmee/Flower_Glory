@@ -1,7 +1,9 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WaveManager : MonoBehaviour
 {
@@ -14,9 +16,14 @@ public class WaveManager : MonoBehaviour
     {
         get { return currentWave; }
     }
+    public int goalFlowerTile = 10;
+
     public bool waveCheck = false;
     int tileAmount = 200;
     public List<Transform> flowerTileList = new List<Transform>();
+
+    public Image flowerCheckFill;
+    
 
     private void Awake()
     {
@@ -31,6 +38,11 @@ public class WaveManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float tileCount = flowerTileList.Count;
+        flowerCheckFill.DOFillAmount(tileCount / goalFlowerTile, 0.3f);
+        //float tileCount = flowerTileList.Count;
+        //flowerCheckFill.fillAmount = tileCount / goalFlowerTile;
+
         if (Input.GetKeyDown(KeyCode.O))
         {
             if(flowerTileList.Count > 0)
@@ -43,22 +55,28 @@ public class WaveManager : MonoBehaviour
         }
     }
 
+    public void UpdateFlowerTile()
+    {
+        float tileCount = flowerTileList.Count;
+        flowerCheckFill.DOFillAmount(tileCount / goalFlowerTile, 0.3f);
+    }
+
     IEnumerator TimeManager()
     {
-        while (true) //!gameover
+        while (!GameManager.Instance.GameOver) //!gameover
         {
-            if (currentTime > 0)
+            while(currentTime > 0 && !waveCheck)
             {
+
                 currentTime -= Time.deltaTime;
                 yield return null;
             }
-            else
-            {
-                StartCoroutine(WaveCheck());
-                //waveCheck
-                yield return null;
 
-            }
+            waveCheck = true;
+            StartCoroutine(WaveCheck());
+            //waveCheck
+            yield return new WaitUntil(() => waveCheck == false);
+
         }
 
     }
@@ -66,10 +84,37 @@ public class WaveManager : MonoBehaviour
     IEnumerator WaveCheck()
     {
         waveCheck = true;
-        Time.timeScale = 0;
 
+        if(flowerTileList.Count >= goalFlowerTile)
+        {
+            StartCoroutine(GameManager.uiManager.WaveCheckLoading(true));
+        }
+        else
+        {
+            StartCoroutine(GameManager.uiManager.WaveCheckLoading(false));
 
+            //gameOver
+        }
         yield return null;
     }
 
+    public IEnumerator NextWave()
+    {
+        if(currentWave <= 9)
+        {
+            limitTime += 20f;
+            goalFlowerTile += 2;
+        }
+        else
+        {
+            limitTime = 200f;
+            goalFlowerTile = 20;
+        }
+        currentTime = limitTime;
+        Time.timeScale = 1.0f;
+        GameManager.waveManager.waveCheck = false;
+        currentWave++;
+        
+        yield return null;
+    }
 }

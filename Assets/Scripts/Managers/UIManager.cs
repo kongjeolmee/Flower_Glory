@@ -4,6 +4,8 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -27,8 +29,22 @@ public class UIManager : MonoBehaviour
     Image timeBar;
 
     [SerializeField]
-    TextMeshProUGUI waveText;
+    TextMeshProUGUI currentWaveText;
+    [SerializeField]
+    GameObject waveCheckObject;
+    [SerializeField]
+    Animator waveCheckAnimator;
 
+    [SerializeField]
+    GameObject resultGo;
+    [SerializeField]
+    TextMeshProUGUI finalWaveText;
+    [SerializeField]
+    TextMeshProUGUI finalMonsterText;
+    [SerializeField]
+    TextMeshProUGUI finalFlowerText;
+    [SerializeField]
+    TextMeshProUGUI finalCurrentFlowerText;
 
     private void Awake()
     {
@@ -44,6 +60,7 @@ public class UIManager : MonoBehaviour
         playerMaxWater = GameManager.player.MaxWater;
         swordCoolMax = GameManager.Instance.SwordCool;
 
+        currentWaveText.text = GameManager.waveManager.CurrentWave.ToString();
     }
 
     private void Update()
@@ -58,9 +75,9 @@ public class UIManager : MonoBehaviour
         }
         
 
-        if(hpCount != GameManager.player.hp)
+        if(hpCount != GameManager.player.Hp)
         {
-            if(hpCount < GameManager.player.hp)
+            if(hpCount < GameManager.player.Hp)
             {
                 hpCount++;
                 hpObject[hpCount].GetComponent<Heart>().HeartSprite(true);
@@ -69,7 +86,20 @@ public class UIManager : MonoBehaviour
             {
                 hpCount--;
                 hpObject[hpCount].GetComponent<Heart>().HeartSprite(false);
+                if(hpCount == 0)
+                {
+                    StartCoroutine(WaveCheckLoading(false));
+                }
             }
+        }
+    }
+
+
+    public void OnClickButton(int type)
+    {
+        if (type == 0)
+        {
+            SceneManager.LoadScene("InGame");
         }
     }
 
@@ -93,4 +123,43 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public IEnumerator WaveCheckLoading(bool clear)
+    {
+        Time.timeScale = 0;
+        if (clear)
+        {
+            //¼º°ø
+            SPXManager.instance.PlayOneShot((int)EffectClips.Clear);
+            waveCheckObject.SetActive(true);
+            waveCheckAnimator.SetInteger("GameState", 1);
+            yield return new WaitForSecondsRealtime(2f);
+            StartCoroutine(GameManager.waveManager.NextWave());
+        }
+        else
+        {
+            SPXManager.instance.PlayOneShot((int)EffectClips.Failed);
+            waveCheckObject.SetActive(true);
+            waveCheckAnimator.SetInteger("GameState", 2);
+            yield return new WaitForSecondsRealtime(2f);
+            GameManager.Instance.GameOver = true;
+            GameOverResult();
+
+        }
+
+        currentWaveText.text = GameManager.waveManager.CurrentWave.ToString();
+        waveCheckAnimator.SetInteger("GameState", 0);
+        waveCheckObject.SetActive(false);
+
+        yield return null;
+    }
+
+    public void GameOverResult()
+    {
+        resultGo.SetActive(true);
+        finalWaveText.text = $"ÃÖ´ë ¿þÀÌºê : {GameManager.waveManager.CurrentWave}";
+        finalMonsterText.text = $"¸ó½ºÅÍ Å³ : {GameManager.Instance.monsterKillCount}";
+        finalFlowerText.text = $"¸¸µç ²É¹ç °¹¼ö : {GameManager.Instance.flowerCount}";
+        finalCurrentFlowerText.text = $"¸¶Áö¸· ²É¹ç °¹¼ö : {GameManager.waveManager.flowerTileList.Count}";
+
+    }
 }

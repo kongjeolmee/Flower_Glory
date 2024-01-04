@@ -165,6 +165,10 @@ public class Tile : MonoBehaviour
             }
 
         }
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Monster") && collision.GetComponent<MonsterAi>().monsterOriginData.name == "SadLarvava")
+        {
+            TileTypeChanger(TileData.TileType.Seal);
+        }
 
     }
 }

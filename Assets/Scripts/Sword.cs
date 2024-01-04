@@ -22,6 +22,8 @@ public class Sword : MonoBehaviour
         
     }
 
+    
+
     public int DamageInt()
     {
         int finalDam = 0;
@@ -41,7 +43,6 @@ public class Sword : MonoBehaviour
     }
     public IEnumerator Attack()
     {
-        Debug.Log("»×");
         spriteRenderer.enabled = true;
         swordCol.enabled = true;
         GameManager.player.IsAttack = true;
@@ -66,7 +67,17 @@ public class Sword : MonoBehaviour
                 yield return new WaitForSeconds(0.00001f);
             }
         }*/
+        int rand = Random.Range(0, 2);
+        if (rand == 0)
+        {
 
+            SPXManager.instance.PlayOneShot((int)EffectClips.Sword1);
+        }
+        else
+        {
+
+            SPXManager.instance.PlayOneShot((int)EffectClips.Sword2);
+        }
         yield return new WaitForSeconds(0.2f);
 
         spriteRenderer.enabled = false;
