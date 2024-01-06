@@ -99,6 +99,8 @@ public class UIManager : MonoBehaviour
     {
         if (type == 0)
         {
+            Time.timeScale = 1;
+            Tile.wellNum = 1;
             SceneManager.LoadScene("InGame");
         }
     }

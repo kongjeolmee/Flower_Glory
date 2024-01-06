@@ -33,7 +33,7 @@ public class Tile : MonoBehaviour
     public GameObject waterProcess;
     private Slider waterProcessSlider;
     private SpriteAtlas tileAtlas;
-    private static int wellNum = 1;
+    public static int wellNum = 1;
 
     public void Init()
     {
